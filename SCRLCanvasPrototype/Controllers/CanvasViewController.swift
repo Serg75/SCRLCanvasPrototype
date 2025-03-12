@@ -20,6 +20,7 @@ class CanvasViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .systemBackground
 
+        // Configure ScrollView
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.backgroundColor = .lightGray
         view.addSubview(scrollView)
@@ -31,6 +32,7 @@ class CanvasViewController: UIViewController {
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
 
+        // Configure CanvasView
         canvasView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(canvasView)
 
@@ -70,10 +72,42 @@ class CanvasViewController: UIViewController {
     }
 }
 
+// MARK: - Overlay Selection Delegate
+
 extension CanvasViewController: OverlaySelectionDelegate {
     func didSelectOverlay(_ overlay: OverlayItem) {
-        print("Selected overlay:", overlay)
-        // TODO: Add the overlay to the canvas
+        Task {
+            if let image = await fetchOverlayImage(from: overlay.imageURL) {
+                addOverlayToCanvas(image: image)
+            }
+        }
+    }
+
+    private func addOverlayToCanvas(image: UIImage) {
+        let overlayView = OverlayItemView(image: image)
+        canvasView.addSubview(overlayView)
+
+        // Position overlay at the center initially
+        overlayView.center = CGPoint(x: canvasView.bounds.midX, y: canvasView.bounds.midY)
+    }
+
+    private func fetchOverlayImage(from urlString: String) async -> UIImage? {
+        if let cachedImage = ImageCache.shared.get(urlString) {
+            return cachedImage
+        }
+
+        guard let url = URL(string: urlString) else { return nil }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            if let image = UIImage(data: data) {
+                ImageCache.shared.set(urlString, image: image)
+                return image
+            }
+        } catch {
+            print("Image fetching error:", error.localizedDescription)
+        }
+        return nil
     }
 }
 
