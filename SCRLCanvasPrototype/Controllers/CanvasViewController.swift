@@ -76,3 +76,21 @@ extension CanvasViewController: OverlaySelectionDelegate {
         // TODO: Add the overlay to the canvas
     }
 }
+
+
+#if DEBUG
+import SwiftUI
+
+struct CanvasPreview: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> CanvasViewController {
+        return CanvasViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: CanvasViewController, context: Context) {}
+}
+
+#Preview {
+    CanvasPreview()
+}
+
+#endif

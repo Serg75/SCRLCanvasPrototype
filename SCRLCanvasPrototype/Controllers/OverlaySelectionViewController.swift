@@ -23,7 +23,7 @@ class OverlaySelectionViewController: UIViewController {
         layout.minimumLineSpacing = 10
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .systemBackground
         return collectionView
     }()
 
@@ -34,7 +34,7 @@ class OverlaySelectionViewController: UIViewController {
     }
 
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         setupNavigationBar()
 
         collectionView.dataSource = self
@@ -105,3 +105,20 @@ extension OverlaySelectionViewController: UICollectionViewDataSource, UICollecti
     }
 }
 
+
+#if DEBUG
+import SwiftUI
+
+struct OverlaySelectionPreview: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        return UINavigationController(rootViewController: OverlaySelectionViewController())
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
+
+#Preview {
+    OverlaySelectionPreview()
+}
+
+#endif
