@@ -8,20 +8,28 @@
 import UIKit
 
 class CanvasViewController: UIViewController {
+
+    // MARK: - Properties
+
     private let scrollView = UIScrollView()
     private let canvasView = CanvasView()
+    private var activeItem: OverlayItemView?
+
+    // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupAddButton()
         setupZoom()
+        addCanvasTapGesture()
     }
+
+    // MARK: - Setup UI
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
 
-        // Configure ScrollView
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.backgroundColor = .darkGray
         scrollView.delegate = self
@@ -78,6 +86,17 @@ class CanvasViewController: UIViewController {
         ])
     }
 
+    private func setupZoom() {
+        scrollView.zoomScale = 0.2 // start zoomed out
+    }
+
+    private func addCanvasTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleCanvasTap))
+        canvasView.addGestureRecognizer(tapGesture)
+    }
+
+    // MARK: - Actions
+
     @objc private func showOverlaySelection() {
         let overlaySelectionVC = OverlaySelectionViewController()
         overlaySelectionVC.delegate = self
@@ -86,8 +105,21 @@ class CanvasViewController: UIViewController {
         present(navController, animated: true)
     }
 
-    private func setupZoom() {
-        scrollView.zoomScale = 0.2 // start zoomed out
+    @objc private func handleCanvasTap() {
+        activeItem?.setActive(false) // deactivate any active item
+        activeItem = nil
+    }
+
+    // MARK: - Helper Methods
+
+    func setScrollEnabled(_ enabled: Bool) {
+        scrollView.isScrollEnabled = enabled
+    }
+
+    func setActiveItem(_ item: OverlayItemView) {
+        activeItem?.setActive(false) // deactivate previously active item
+        activeItem = item
+        item.setActive(true) // activate the new item
     }
 }
 
@@ -138,6 +170,8 @@ extension CanvasViewController: UIScrollViewDelegate {
     }
 }
 
+
+// MARK: - SwiftUI Preview (For Debugging)
 
 #if DEBUG
 import SwiftUI
