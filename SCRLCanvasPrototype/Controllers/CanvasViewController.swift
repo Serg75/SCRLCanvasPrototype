@@ -15,6 +15,7 @@ class CanvasViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupAddButton()
+        setupZoom()
     }
 
     private func setupUI() {
@@ -22,18 +23,30 @@ class CanvasViewController: UIViewController {
 
         // Configure ScrollView
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.backgroundColor = .lightGray
+        scrollView.backgroundColor = .darkGray
+        scrollView.delegate = self
+        scrollView.minimumZoomScale = 0.1
+        scrollView.maximumZoomScale = 4.0
+        scrollView.alwaysBounceVertical = true
+        scrollView.alwaysBounceHorizontal = true
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
+
         view.addSubview(scrollView)
 
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
 
-        // Configure CanvasView
+        // set canvas size to 16:5 ratio
+        let canvasWidth: CGFloat = 4800
+        let canvasHeight: CGFloat = 1500
+
         canvasView.translatesAutoresizingMaskIntoConstraints = false
+        canvasView.backgroundColor = .white
         scrollView.addSubview(canvasView)
 
         NSLayoutConstraint.activate([
@@ -41,9 +54,11 @@ class CanvasViewController: UIViewController {
             canvasView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             canvasView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             canvasView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            canvasView.widthAnchor.constraint(equalToConstant: 1000),
-            canvasView.heightAnchor.constraint(equalToConstant: 2000)
+            canvasView.widthAnchor.constraint(equalToConstant: canvasWidth),
+            canvasView.heightAnchor.constraint(equalToConstant: canvasHeight)
         ])
+
+        scrollView.contentSize = CGSize(width: canvasWidth, height: canvasHeight)
     }
 
     private func setupAddButton() {
@@ -69,6 +84,10 @@ class CanvasViewController: UIViewController {
         let navController = UINavigationController(rootViewController: overlaySelectionVC)
         navController.modalPresentationStyle = .pageSheet
         present(navController, animated: true)
+    }
+
+    private func setupZoom() {
+        scrollView.zoomScale = 0.2 // start zoomed out
     }
 }
 
@@ -108,6 +127,14 @@ extension CanvasViewController: OverlaySelectionDelegate {
             print("Image fetching error:", error.localizedDescription)
         }
         return nil
+    }
+}
+
+// MARK: - UIScrollViewDelegate
+
+extension CanvasViewController: UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return canvasView
     }
 }
 
