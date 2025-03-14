@@ -7,9 +7,18 @@
 
 import UIKit
 
+protocol OverlayItemViewDelegate: AnyObject {
+    func setActiveItem(_ item: OverlayItemView)
+    func updateSnapLines(for result: SnapDetector.SnapResult)
+    func setScrollEnabled(_ enabled: Bool)
+    func detectSnaps(for overlay: OverlayItemView, proposedPosition: CGPoint) -> SnapDetector.SnapResult
+}
+
 class OverlayItemView: UIImageView {
 
     // MARK: - Properties
+
+    weak var delegate: OverlayItemViewDelegate?
 
     private let highlightView = UIView()
 
@@ -22,8 +31,11 @@ class OverlayItemView: UIImageView {
 
     // MARK: - Initializers
 
-    init(image: UIImage) {
+    init(image: UIImage, delegate: OverlayItemViewDelegate?) {
+        self.delegate = delegate
+
         super.init(image: image)
+
         self.isUserInteractionEnabled = true
         self.contentMode = .scaleAspectFit
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -34,10 +46,7 @@ class OverlayItemView: UIImageView {
     }
 
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setupHighlightView()
-        addTapGesture()
-        addPanGesture()
+        fatalError("init(coder:) is not implemented!")
     }
 
     // MARK: - Setup Methods
@@ -70,25 +79,33 @@ class OverlayItemView: UIImageView {
     // MARK: - Gesture Handlers
 
     @objc private func handleTap() {
-        guard let canvasVC = findCanvasViewController() else { return }
-        canvasVC.setActiveItem(self) // notify the canvas that this item is now active
+        delegate?.setActiveItem(self)
     }
 
     @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
-        guard isActive else { return } // only allow movement if the item is active
-        guard let superview = self.superview else { return }
-        guard let canvasVC = findCanvasViewController() else { return }
+        guard isActive, let superview = self.superview else { return }
 
         let translation = gesture.translation(in: superview)
+        let proposedPosition = CGPoint(x: initialCenter.x + translation.x, y: initialCenter.y + translation.y)
+
+        let snapResult = delegate?.detectSnaps(for: self, proposedPosition: proposedPosition) ?? SnapDetector.SnapResult()
+
+        var newCenter = proposedPosition
+        if let snappedX = snapResult.snappedX { newCenter.x = snappedX }
+        if let snappedY = snapResult.snappedY { newCenter.y = snappedY }
 
         switch gesture.state {
         case .began:
             initialCenter = self.center
-            canvasVC.setScrollEnabled(false) // disable scrolling while dragging
+            delegate?.setScrollEnabled(false) // disable scrolling while dragging
+
         case .changed:
-            self.center = CGPoint(x: initialCenter.x + translation.x, y: initialCenter.y + translation.y)
+            self.center = newCenter
+            delegate?.updateSnapLines(for: snapResult)
+
         case .ended, .cancelled:
-            canvasVC.setScrollEnabled(true) // re-enable scrolling
+            delegate?.setScrollEnabled(true) // re-enable scrolling
+
         default:
             break
         }
@@ -102,19 +119,6 @@ class OverlayItemView: UIImageView {
 
     private func updateHighlight() {
         highlightView.isHidden = !isActive
-    }
-
-    // MARK: - Helper Methods
-
-    private func findCanvasViewController() -> CanvasViewController? {
-        var responder: UIResponder? = self
-        while let nextResponder = responder?.next {
-            if let viewController = nextResponder as? CanvasViewController {
-                return viewController
-            }
-            responder = nextResponder
-        }
-        return nil
     }
 }
 

@@ -11,18 +11,32 @@ class CanvasViewController: UIViewController {
 
     // MARK: - Properties
 
+    // set canvas size to 16:5 ratio
+    private static let canvasWidth: CGFloat = 4800
+    private static let canvasHeight: CGFloat = 1500
+    private static let canvasFrame: CGRect = CGRect(x: 0, y: 0, width: canvasWidth, height: canvasHeight)
+    
+    private let canvasView = CanvasView(frame: canvasFrame)
     private let scrollView = UIScrollView()
-    private let canvasView = CanvasView()
+    private let snapDetector = SnapDetector()
+
     private var activeItem: OverlayItemView?
+    private var overlays: [OverlayItemView] = []
 
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         setupUI()
         setupAddButton()
         setupZoom()
         addCanvasTapGesture()
+
+        snapDetector.updateGuidelines(
+            vertical: canvasView.verticalGuidelinePositions,
+            horizontal: canvasView.horizontalGuidelinePositions
+        )
     }
 
     // MARK: - Setup UI
@@ -49,10 +63,6 @@ class CanvasViewController: UIViewController {
             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
 
-        // set canvas size to 16:5 ratio
-        let canvasWidth: CGFloat = 4800
-        let canvasHeight: CGFloat = 1500
-
         canvasView.translatesAutoresizingMaskIntoConstraints = false
         canvasView.backgroundColor = .white
         scrollView.addSubview(canvasView)
@@ -62,11 +72,12 @@ class CanvasViewController: UIViewController {
             canvasView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             canvasView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             canvasView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            canvasView.widthAnchor.constraint(equalToConstant: canvasWidth),
-            canvasView.heightAnchor.constraint(equalToConstant: canvasHeight)
+            canvasView.widthAnchor.constraint(equalToConstant: CanvasViewController.canvasWidth),
+            canvasView.heightAnchor.constraint(equalToConstant: CanvasViewController.canvasHeight)
         ])
 
-        scrollView.contentSize = CGSize(width: canvasWidth, height: canvasHeight)
+        scrollView.contentSize = CGSize(width: CanvasViewController.canvasWidth,
+                                        height: CanvasViewController.canvasHeight)
     }
 
     private func setupAddButton() {
@@ -109,18 +120,6 @@ class CanvasViewController: UIViewController {
         activeItem?.setActive(false) // deactivate any active item
         activeItem = nil
     }
-
-    // MARK: - Helper Methods
-
-    func setScrollEnabled(_ enabled: Bool) {
-        scrollView.isScrollEnabled = enabled
-    }
-
-    func setActiveItem(_ item: OverlayItemView) {
-        activeItem?.setActive(false) // deactivate previously active item
-        activeItem = item
-        item.setActive(true) // activate the new item
-    }
 }
 
 // MARK: - Overlay Selection Delegate
@@ -135,10 +134,10 @@ extension CanvasViewController: OverlaySelectionDelegate {
     }
 
     private func addOverlayToCanvas(image: UIImage) {
-        let overlayView = OverlayItemView(image: image)
+        let overlayView = OverlayItemView(image: image, delegate: self)
+        overlays.append(overlayView)
+        snapDetector.updateOverlays(overlays)
         canvasView.addSubview(overlayView)
-
-        // Position overlay at the center initially
         overlayView.center = CGPoint(x: canvasView.bounds.midX, y: canvasView.bounds.midY)
     }
 
@@ -167,6 +166,35 @@ extension CanvasViewController: OverlaySelectionDelegate {
 extension CanvasViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return canvasView
+    }
+}
+
+// MARK: - OverlayItemViewDelegate
+
+extension CanvasViewController: OverlayItemViewDelegate {
+    func setActiveItem(_ item: OverlayItemView) {
+        activeItem?.setActive(false) // deactivate previously active item
+        activeItem = item
+        item.setActive(true) // activate the new item
+    }
+
+    func updateSnapLines(for result: SnapDetector.SnapResult) {
+        let verticalSnapPositions = result.snapLines.filter { $0.isVertical }.map { $0.position }
+        let horizontalSnapPositions = result.snapLines.filter { !$0.isVertical }.map { $0.position }
+
+        if verticalSnapPositions.isEmpty && horizontalSnapPositions.isEmpty {
+            canvasView.hideSnapLines()
+        } else {
+            canvasView.showSnapLines(vertical: verticalSnapPositions, horizontal: horizontalSnapPositions)
+        }
+    }
+
+    func setScrollEnabled(_ enabled: Bool) {
+        scrollView.isScrollEnabled = enabled
+    }
+
+    func detectSnaps(for overlay: OverlayItemView, proposedPosition: CGPoint) -> SnapDetector.SnapResult {
+        return snapDetector.detectSnaps(for: overlay, proposedPosition: proposedPosition)
     }
 }
 
