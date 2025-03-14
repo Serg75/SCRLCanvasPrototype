@@ -20,8 +20,9 @@ class CanvasView: UIView {
     private(set) var verticalGuidelinePositions: [CGFloat] = []
     private(set) var horizontalGuidelinePositions: [CGFloat] = []
 
-    private var verticalSnapLinePositions: [CGFloat] = []
-    private var horizontalSnapLinePositions: [CGFloat] = []
+    // shape layers for drawing lines
+    private let guidelineLayer = CAShapeLayer()
+    private let snapLineLayer = CAShapeLayer()
 
     override init(frame: CGRect) {
         canvasWidth = frame.width
@@ -31,6 +32,8 @@ class CanvasView: UIView {
 
         backgroundColor = .white
         setupGuidelines()
+        setupGuidelineLayer()
+        setupSnapLineLayer()
     }
 
     required init?(coder: NSCoder) {
@@ -54,56 +57,66 @@ class CanvasView: UIView {
         ]
     }
 
-    // MARK: - Drawing Guidelines & Snap Lines
+    // MARK: - Setup Guideline Layer
 
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-
-        guard let context = UIGraphicsGetCurrentContext() else { return }
-
-        context.setLineWidth(guidelineThickness)
-
-        // draw vertical guidelines (black)
-        context.setStrokeColor(guidelineColor.cgColor)
-        for x in verticalGuidelinePositions {
-            context.move(to: CGPoint(x: x, y: 0))
-            context.addLine(to: CGPoint(x: x, y: canvasHeight))
-        }
-
-        // draw horizontal guidelines (black)
-        for y in horizontalGuidelinePositions {
-            context.move(to: CGPoint(x: 0, y: y))
-            context.addLine(to: CGPoint(x: canvasWidth, y: y))
-        }
-        context.strokePath()
-
-        // draw snap lines (yellow)
-        context.setStrokeColor(snapLineColor.cgColor)
-        context.setLineWidth(snapLineThickness)
-
-        for x in verticalSnapLinePositions {
-            context.move(to: CGPoint(x: x, y: 0))
-            context.addLine(to: CGPoint(x: x, y: canvasHeight))
-        }
-
-        for y in horizontalSnapLinePositions {
-            context.move(to: CGPoint(x: 0, y: y))
-            context.addLine(to: CGPoint(x: canvasWidth, y: y))
-        }
-        context.strokePath()
+    private func setupGuidelineLayer() {
+        guidelineLayer.strokeColor = guidelineColor.cgColor
+        guidelineLayer.fillColor = nil
+        guidelineLayer.lineWidth = guidelineThickness
+        guidelineLayer.zPosition = 999 // ensure it's above background
+        layer.addSublayer(guidelineLayer)
+        drawGuidelines() // initial rendering
     }
 
-    // MARK: - Snapping Line Management
+    private func drawGuidelines() {
+        let path = UIBezierPath()
+
+        for x in verticalGuidelinePositions {
+            path.move(to: CGPoint(x: x, y: 0))
+            path.addLine(to: CGPoint(x: x, y: canvasHeight))
+        }
+
+        for y in horizontalGuidelinePositions {
+            path.move(to: CGPoint(x: 0, y: y))
+            path.addLine(to: CGPoint(x: canvasWidth, y: y))
+        }
+
+        guidelineLayer.path = path.cgPath
+    }
+
+    // MARK: - Setup Snap Line Layer
+
+    private func setupSnapLineLayer() {
+        snapLineLayer.strokeColor = snapLineColor.cgColor
+        snapLineLayer.fillColor = nil
+        snapLineLayer.lineWidth = snapLineThickness
+        snapLineLayer.zPosition = 1000 // ensure it's above overlays
+        layer.addSublayer(snapLineLayer)
+    }
+
+    // MARK: - Drawing Snap Lines
 
     func showSnapLines(vertical: [CGFloat], horizontal: [CGFloat]) {
-        verticalSnapLinePositions = vertical
-        horizontalSnapLinePositions = horizontal
-        setNeedsDisplay()
+        let path = UIBezierPath()
+
+        for x in vertical {
+            path.move(to: CGPoint(x: x, y: 0))
+            path.addLine(to: CGPoint(x: x, y: canvasHeight))
+        }
+
+        for y in horizontal {
+            path.move(to: CGPoint(x: 0, y: y))
+            path.addLine(to: CGPoint(x: canvasWidth, y: y))
+        }
+
+        DispatchQueue.main.async {
+            self.snapLineLayer.path = path.cgPath
+        }
     }
 
     func hideSnapLines() {
-        verticalSnapLinePositions.removeAll()
-        horizontalSnapLinePositions.removeAll()
-        setNeedsDisplay()
+        DispatchQueue.main.async {
+            self.snapLineLayer.path = nil
+        }
     }
 }
