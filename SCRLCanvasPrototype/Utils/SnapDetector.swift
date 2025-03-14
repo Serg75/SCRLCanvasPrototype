@@ -110,3 +110,19 @@ class SnapDetector {
         return abs(closest - position) <= snapThreshold ? closest : nil
     }
 }
+
+// MARK - Equatable
+
+extension SnapDetector.SnapResult: Equatable {
+    static func == (lhs: SnapDetector.SnapResult, rhs: SnapDetector.SnapResult) -> Bool {
+        return lhs.snappedX == rhs.snappedX &&
+               lhs.snappedY == rhs.snappedY &&
+               lhs.snapLines == rhs.snapLines
+    }
+}
+
+extension SnapDetector.SnapLine: Equatable {
+    static func == (lhs: SnapDetector.SnapLine, rhs: SnapDetector.SnapLine) -> Bool {
+        return lhs.position == rhs.position && lhs.isVertical == rhs.isVertical
+    }
+}

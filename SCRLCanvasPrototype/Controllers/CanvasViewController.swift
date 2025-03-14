@@ -22,6 +22,8 @@ class CanvasViewController: UIViewController {
 
     private var activeItem: OverlayItemView?
     private var overlays: [OverlayItemView] = []
+    private var hapticFeedbackGenerator: UIImpactFeedbackGenerator?
+    private var lastSnapResult: SnapDetector.SnapResult?
 
     // MARK: - Lifecycle
 
@@ -37,6 +39,9 @@ class CanvasViewController: UIViewController {
             vertical: canvasView.verticalGuidelinePositions,
             horizontal: canvasView.horizontalGuidelinePositions
         )
+
+        hapticFeedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+        hapticFeedbackGenerator?.prepare()
     }
 
     // MARK: - Setup UI
@@ -184,8 +189,13 @@ extension CanvasViewController: OverlayItemViewDelegate {
 
         if verticalSnapPositions.isEmpty && horizontalSnapPositions.isEmpty {
             canvasView.hideSnapLines()
+            lastSnapResult = nil
         } else {
-            canvasView.showSnapLines(vertical: verticalSnapPositions, horizontal: horizontalSnapPositions)
+            if result != lastSnapResult {
+                canvasView.showSnapLines(vertical: verticalSnapPositions, horizontal: horizontalSnapPositions)
+                hapticFeedbackGenerator?.impactOccurred()
+                lastSnapResult = result
+            }
         }
     }
 
