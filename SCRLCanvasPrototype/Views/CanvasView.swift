@@ -17,8 +17,10 @@ class CanvasView: UIView {
     private let canvasWidth: CGFloat
     private let canvasHeight: CGFloat
 
-    private(set) var verticalGuidelinePositions: [CGFloat] = []
-    private(set) var horizontalGuidelinePositions: [CGFloat] = []
+    private(set) var verticalGuidelines: [CGFloat] = []
+    private(set) var horizontalGuidelines: [CGFloat] = []
+    private var verticalVisibleGuidelines: [CGFloat] = []
+    private var horizontalVisibleGuidelines: [CGFloat] = []
 
     // shape layers for drawing lines
     private let guidelineLayer = CAShapeLayer()
@@ -43,17 +45,35 @@ class CanvasView: UIView {
     // MARK: - Setup Guidelines
 
     private func setupGuidelines() {
-        verticalGuidelinePositions = [
+        verticalGuidelines = [
             0,                        // left canvas border
+            canvasWidth * 0.125,
             canvasWidth * 0.25,
+            canvasWidth * 0.375,
             canvasWidth * 0.5,
+            canvasWidth * 0.625,
             canvasWidth * 0.75,
+            canvasWidth * 0.875,
             canvasWidth               // right canvas border
         ]
 
-        horizontalGuidelinePositions = [
+        verticalVisibleGuidelines = [
+            0,
+            canvasWidth * 0.25,
+            canvasWidth * 0.5,
+            canvasWidth * 0.75,
+            canvasWidth
+        ]
+
+        horizontalGuidelines = [
             0,                        // top canvas border
+            canvasHeight * 0.5,
             canvasHeight              // bottom canvas border
+        ]
+
+        horizontalVisibleGuidelines = [
+            0,
+            canvasHeight
         ]
     }
 
@@ -71,12 +91,12 @@ class CanvasView: UIView {
     private func drawGuidelines() {
         let path = UIBezierPath()
 
-        for x in verticalGuidelinePositions {
+        for x in verticalVisibleGuidelines {
             path.move(to: CGPoint(x: x, y: 0))
             path.addLine(to: CGPoint(x: x, y: canvasHeight))
         }
 
-        for y in horizontalGuidelinePositions {
+        for y in horizontalVisibleGuidelines {
             path.move(to: CGPoint(x: 0, y: y))
             path.addLine(to: CGPoint(x: canvasWidth, y: y))
         }

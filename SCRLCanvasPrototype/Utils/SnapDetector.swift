@@ -59,10 +59,14 @@ class SnapDetector {
 
         // check snapping for Y-axis (top, center, bottom edges)
         let topEdge = proposedPosition.y - overlay.bounds.height / 2
+        let centerY = proposedPosition.y
         let bottomEdge = proposedPosition.y + overlay.bounds.height / 2
 
         if let snapY = findClosestSnap(to: topEdge, in: horizontalGuidelines) {
             result.snappedY = snapY + overlay.bounds.height / 2
+            result.snapLines.append(SnapLine(position: snapY, isVertical: false))
+        } else if let snapY = findClosestSnap(to: centerY, in: horizontalGuidelines) {
+            result.snappedY = snapY
             result.snapLines.append(SnapLine(position: snapY, isVertical: false))
         } else if let snapY = findClosestSnap(to: bottomEdge, in: horizontalGuidelines) {
             result.snappedY = snapY - overlay.bounds.height / 2
@@ -92,6 +96,9 @@ class SnapDetector {
 
             if let snapY = findClosestSnap(to: topEdge, in: [otherTop, otherCenterY, otherBottom]) {
                 result.snappedY = snapY + overlay.bounds.height / 2
+                result.snapLines.append(SnapLine(position: snapY, isVertical: false))
+            } else if let snapY = findClosestSnap(to: centerY, in: [otherTop, otherCenterY, otherBottom]) {
+                result.snappedY = snapY
                 result.snapLines.append(SnapLine(position: snapY, isVertical: false))
             } else if let snapY = findClosestSnap(to: bottomEdge, in: [otherTop, otherCenterY, otherBottom]) {
                 result.snappedY = snapY - overlay.bounds.height / 2

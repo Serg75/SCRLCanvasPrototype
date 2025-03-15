@@ -36,8 +36,8 @@ class CanvasViewController: UIViewController {
         addCanvasTapGesture()
 
         snapDetector.updateGuidelines(
-            vertical: canvasView.verticalGuidelinePositions,
-            horizontal: canvasView.horizontalGuidelinePositions
+            vertical: canvasView.verticalGuidelines,
+            horizontal: canvasView.horizontalGuidelines
         )
 
         hapticFeedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
