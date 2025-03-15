@@ -168,6 +168,7 @@ extension CanvasViewController: OverlaySelectionDelegate {
             y: visibleCenterY / scrollView.zoomScale
         )
         overlayView.center = canvasCenter
+        setActiveItem(overlayView)
     }
 
     private func fetchOverlayImage(from urlString: String) async -> UIImage? {
