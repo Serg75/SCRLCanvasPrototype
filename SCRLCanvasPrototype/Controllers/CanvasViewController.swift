@@ -159,7 +159,15 @@ extension CanvasViewController: OverlaySelectionDelegate {
         overlays.append(overlayView)
         snapDetector.updateOverlays(overlays)
         canvasView.addSubview(overlayView)
-        overlayView.center = CGPoint(x: canvasView.bounds.midX, y: canvasView.bounds.midY)
+
+        let visibleCenterX = scrollView.contentOffset.x + (scrollView.bounds.width / 2)
+        let visibleCenterY = scrollView.contentOffset.y + (scrollView.bounds.height / 2)
+
+        let canvasCenter = CGPoint(
+            x: visibleCenterX / scrollView.zoomScale,
+            y: visibleCenterY / scrollView.zoomScale
+        )
+        overlayView.center = canvasCenter
     }
 
     private func fetchOverlayImage(from urlString: String) async -> UIImage? {

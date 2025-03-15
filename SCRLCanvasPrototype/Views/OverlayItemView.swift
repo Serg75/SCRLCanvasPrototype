@@ -38,7 +38,7 @@ class OverlayItemView: UIImageView {
 
         self.isUserInteractionEnabled = true
         self.contentMode = .scaleAspectFit
-        self.translatesAutoresizingMaskIntoConstraints = false
+        self.translatesAutoresizingMaskIntoConstraints = true
 
         setupHighlightView()
         addTapGesture()
