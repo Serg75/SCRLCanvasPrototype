@@ -44,6 +44,22 @@ class CanvasViewController: UIViewController {
         hapticFeedbackGenerator?.prepare()
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        guard scrollView.zoomScale > 0 else { return }
+
+        let horizontalMargin: CGFloat = 40
+        let scrollViewSize = scrollView.bounds.size
+        let scaledCanvasHeight = CanvasViewController.canvasHeight * scrollView.zoomScale
+
+        // calculate insets to vertically center the canvas
+        let insetX = horizontalMargin
+        let insetY = max((scrollViewSize.height - scaledCanvasHeight) / 2, 0)
+
+        scrollView.contentInset = UIEdgeInsets(top: insetY, left: insetX, bottom: insetY, right: insetX)
+    }
+
     // MARK: - Setup UI
 
     private func setupUI() {
