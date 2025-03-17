@@ -168,6 +168,7 @@ extension CanvasViewController: OverlaySelectionDelegate {
             y: visibleCenterY / scrollView.zoomScale
         )
         overlayView.center = canvasCenter
+        overlayView.prepareForDisplay()
         setActiveItem(overlayView)
     }
 

@@ -7,6 +7,15 @@
 
 import UIKit
 
+private enum Axis {
+    case horizontal, vertical
+}
+
+private enum EdgeType {
+    case left, centerX, right
+    case top, centerY, bottom
+}
+
 class SnapDetector {
 
     struct SnapResult {
@@ -40,70 +49,48 @@ class SnapDetector {
 
     func detectSnaps(for overlay: OverlayItemView, proposedPosition: CGPoint) -> SnapResult {
         var result = SnapResult()
+        let snapToCenterOnly = !overlay.canSnapsToEdges
 
-        // check snapping for X-axis (left, center, right edges)
-        let leftEdge = proposedPosition.x - overlay.bounds.width / 2
-        let centerX = proposedPosition.x
-        let rightEdge = proposedPosition.x + overlay.bounds.width / 2
+        let edges = rotatedEdges(for: overlay, at: proposedPosition)
 
-        if let snapX = findClosestSnap(to: leftEdge, in: verticalGuidelines) {
-            result.snappedX = snapX + overlay.bounds.width / 2
-            result.snapLines.append(SnapLine(position: snapX, isVertical: true))
-        } else if let snapX = findClosestSnap(to: centerX, in: verticalGuidelines) {
-            result.snappedX = snapX
-            result.snapLines.append(SnapLine(position: snapX, isVertical: true))
-        } else if let snapX = findClosestSnap(to: rightEdge, in: verticalGuidelines) {
-            result.snappedX = snapX - overlay.bounds.width / 2
-            result.snapLines.append(SnapLine(position: snapX, isVertical: true))
-        }
+        // canvas snapping
 
-        // check snapping for Y-axis (top, center, bottom edges)
-        let topEdge = proposedPosition.y - overlay.bounds.height / 2
-        let centerY = proposedPosition.y
-        let bottomEdge = proposedPosition.y + overlay.bounds.height / 2
+        result.snappedX = snap(for: edges,
+                               axis: .horizontal,
+                               centerOnly: snapToCenterOnly,
+                               candidates: verticalGuidelines,
+                               proposed: proposedPosition.x,
+                               result: &result)
 
-        if let snapY = findClosestSnap(to: topEdge, in: horizontalGuidelines) {
-            result.snappedY = snapY + overlay.bounds.height / 2
-            result.snapLines.append(SnapLine(position: snapY, isVertical: false))
-        } else if let snapY = findClosestSnap(to: centerY, in: horizontalGuidelines) {
-            result.snappedY = snapY
-            result.snapLines.append(SnapLine(position: snapY, isVertical: false))
-        } else if let snapY = findClosestSnap(to: bottomEdge, in: horizontalGuidelines) {
-            result.snappedY = snapY - overlay.bounds.height / 2
-            result.snapLines.append(SnapLine(position: snapY, isVertical: false))
-        }
+        result.snappedY = snap(for: edges,
+                               axis: .vertical,
+                               centerOnly: snapToCenterOnly,
+                               candidates: horizontalGuidelines,
+                               proposed: proposedPosition.y,
+                               result: &result)
 
-        // check snapping between overlays
+        // snap to other overlays
+
         for otherOverlay in overlays where otherOverlay !== overlay {
-            let otherLeft = otherOverlay.frame.origin.x
-            let otherCenterX = otherOverlay.center.x
-            let otherRight = otherOverlay.frame.origin.x + otherOverlay.bounds.width
+            let otherEdges = rotatedEdges(for: otherOverlay, at: otherOverlay.center)
+            let xCandidates = [otherEdges.left, otherEdges.centerX, otherEdges.right]
+            let yCandidates = [otherEdges.top, otherEdges.centerY, otherEdges.bottom]
 
-            if let snapX = findClosestSnap(to: leftEdge, in: [otherLeft, otherCenterX, otherRight]) {
-                result.snappedX = snapX + overlay.bounds.width / 2
-                result.snapLines.append(SnapLine(position: snapX, isVertical: true))
-            } else if let snapX = findClosestSnap(to: centerX, in: [otherLeft, otherCenterX, otherRight]) {
-                result.snappedX = snapX
-                result.snapLines.append(SnapLine(position: snapX, isVertical: true))
-            } else if let snapX = findClosestSnap(to: rightEdge, in: [otherLeft, otherCenterX, otherRight]) {
-                result.snappedX = snapX - overlay.bounds.width / 2
-                result.snapLines.append(SnapLine(position: snapX, isVertical: true))
-            }
+            result.snappedX = snap(for: edges,
+                                   axis: .horizontal,
+                                   centerOnly: snapToCenterOnly,
+                                   candidates: xCandidates,
+                                   proposed: proposedPosition.x,
+                                   result: &result,
+                                   override: result.snappedX)
 
-            let otherTop = otherOverlay.frame.origin.y
-            let otherCenterY = otherOverlay.center.y
-            let otherBottom = otherOverlay.frame.origin.y + otherOverlay.bounds.height
-
-            if let snapY = findClosestSnap(to: topEdge, in: [otherTop, otherCenterY, otherBottom]) {
-                result.snappedY = snapY + overlay.bounds.height / 2
-                result.snapLines.append(SnapLine(position: snapY, isVertical: false))
-            } else if let snapY = findClosestSnap(to: centerY, in: [otherTop, otherCenterY, otherBottom]) {
-                result.snappedY = snapY
-                result.snapLines.append(SnapLine(position: snapY, isVertical: false))
-            } else if let snapY = findClosestSnap(to: bottomEdge, in: [otherTop, otherCenterY, otherBottom]) {
-                result.snappedY = snapY - overlay.bounds.height / 2
-                result.snapLines.append(SnapLine(position: snapY, isVertical: false))
-            }
+            result.snappedY = snap(for: edges,
+                                   axis: .vertical,
+                                   centerOnly: snapToCenterOnly,
+                                   candidates: yCandidates,
+                                   proposed: proposedPosition.y,
+                                   result: &result,
+                                   override: result.snappedY)
         }
 
         return result
@@ -115,6 +102,86 @@ class SnapDetector {
         guard let closest = candidates.min(by: { abs($0 - position) < abs($1 - position) }) else { return nil }
 
         return abs(closest - position) <= snapThreshold ? closest : nil
+    }
+
+    private func rotatedEdges(for overlay: OverlayItemView, at position: CGPoint) -> (left: CGFloat, centerX: CGFloat, right: CGFloat, top: CGFloat, centerY: CGFloat, bottom: CGFloat) {
+        let rotation = overlay.currentRotation
+        let size = overlay.bounds.size
+        let halfSize = CGSize(width: size.width / 2, height: size.height / 2)
+
+        let corners = [
+            CGPoint(x: -halfSize.width, y: -halfSize.height),
+            CGPoint(x:  halfSize.width, y: -halfSize.height),
+            CGPoint(x:  halfSize.width, y:  halfSize.height),
+            CGPoint(x: -halfSize.width, y:  halfSize.height)
+        ]
+
+        let rotatedCorners = corners.map { point -> CGPoint in
+            let rotatedX = cos(rotation) * point.x - sin(rotation) * point.y
+            let rotatedY = sin(rotation) * point.x + cos(rotation) * point.y
+            return CGPoint(x: position.x + rotatedX, y: position.y + rotatedY)
+        }
+
+        let xs = rotatedCorners.map { $0.x }
+        let ys = rotatedCorners.map { $0.y }
+
+        return (
+            left: xs.min()!,
+            centerX: position.x,
+            right: xs.max()!,
+            top: ys.min()!,
+            centerY: position.y,
+            bottom: ys.max()!
+        )
+    }
+
+    private func snap(for edges: (left: CGFloat, centerX: CGFloat, right: CGFloat, top: CGFloat, centerY: CGFloat, bottom: CGFloat),
+                      axis: Axis,
+                      centerOnly: Bool,
+                      candidates: [CGFloat],
+                      proposed: CGFloat,
+                      result: inout SnapResult,
+                      override: CGFloat? = nil) -> CGFloat? {
+
+        guard override == nil else { return override } // already snapped
+
+        let edgeSnaps: [(value: CGFloat, type: EdgeType)]
+        let isVertical = (axis == .horizontal)
+
+        if centerOnly {
+            edgeSnaps = [(
+                axis == .horizontal ? edges.centerX : edges.centerY,
+                axis == .horizontal ? .centerX : .centerY
+            )]
+        } else {
+            if axis == .horizontal {
+                edgeSnaps = [
+                    (edges.left, .left),
+                    (edges.centerX, .centerX),
+                    (edges.right, .right)
+                ]
+            } else {
+                edgeSnaps = [
+                    (edges.top, .top),
+                    (edges.centerY, .centerY),
+                    (edges.bottom, .bottom)
+                ]
+            }
+        }
+
+        for (value, type) in edgeSnaps {
+            if let snap = findClosestSnap(to: value, in: candidates) {
+                result.snapLines.append(SnapLine(position: snap, isVertical: isVertical))
+
+                switch type {
+                case .left, .top, .right, .bottom:
+                    return proposed + (snap - value)
+                case .centerX, .centerY:
+                    return snap
+                }
+            }
+        }
+        return nil
     }
 }
 
