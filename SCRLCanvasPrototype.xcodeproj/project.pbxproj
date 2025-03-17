@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		95BCE16D2D8815CF005A6EF0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 95BCE16C2D8815CF005A6EF0 /* README.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		955215BE2D86284E0044B416 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -18,6 +22,7 @@
 
 /* Begin PBXFileReference section */
 		955215BA2D86284E0044B416 /* SCRLCanvasPrototype_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SCRLCanvasPrototype_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		95BCE16C2D8815CF005A6EF0 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		95EB3BD52D80915800E0F135 /* SCRLCanvasPrototype.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SCRLCanvasPrototype.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -68,6 +73,7 @@
 		95EB3BCC2D80915800E0F135 = {
 			isa = PBXGroup;
 			children = (
+				95BCE16C2D8815CF005A6EF0 /* README.md */,
 				95EB3BD72D80915800E0F135 /* SCRLCanvasPrototype */,
 				955215BB2D86284E0044B416 /* SCRLCanvasPrototype_Tests */,
 				95EB3BD62D80915800E0F135 /* Products */,
@@ -182,6 +188,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				95BCE16D2D8815CF005A6EF0 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
