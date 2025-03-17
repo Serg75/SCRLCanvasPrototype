@@ -9,21 +9,27 @@ import Foundation
 
 class OverlayFetcher {
     static let shared = OverlayFetcher()
-    private let overlayURL = URL(string: "https://appostropheanalytics.herokuapp.com/scrl/test/overlays")!
+    static let productionURL: URL = URL(string: "https://appostropheanalytics.herokuapp.com/scrl/test/overlays")!
 
-    // In-memory cache to prevent redundant network requests
+    private let overlayURL: URL
     private var cachedOverlays: [OverlayItem]?
+    private let urlSession: URLSession
+
+    init(urlSession: URLSession = .shared, overlayURL: URL = productionURL) {
+        self.urlSession = urlSession
+        self.overlayURL = overlayURL
+    }
 
     func fetchOverlays() async throws -> [OverlayItem] {
         if let cached = cachedOverlays {
             return cached
         }
 
-        let (data, _) = try await URLSession.shared.data(from: overlayURL)
+        let (data, _) = try await urlSession.data(from: overlayURL)
         let categories = try JSONDecoder().decode([OverlayCategory].self, from: data)
         let allOverlays = categories.flatMap { $0.items }
 
-        cachedOverlays = allOverlays // Cache the results
+        cachedOverlays = allOverlays
         return allOverlays
     }
 }

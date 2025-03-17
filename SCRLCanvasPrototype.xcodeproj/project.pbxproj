@@ -6,7 +6,18 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		955215BE2D86284E0044B416 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 95EB3BCD2D80915800E0F135 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 95EB3BD42D80915800E0F135;
+			remoteInfo = SCRLCanvasPrototype;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		955215BA2D86284E0044B416 /* SCRLCanvasPrototype_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SCRLCanvasPrototype_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		95EB3BD52D80915800E0F135 /* SCRLCanvasPrototype.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SCRLCanvasPrototype.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -21,6 +32,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		955215BB2D86284E0044B416 /* SCRLCanvasPrototype_Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SCRLCanvasPrototype_Tests;
+			sourceTree = "<group>";
+		};
 		95EB3BD72D80915800E0F135 /* SCRLCanvasPrototype */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -32,6 +48,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		955215B72D86284E0044B416 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		95EB3BD22D80915800E0F135 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -46,6 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				95EB3BD72D80915800E0F135 /* SCRLCanvasPrototype */,
+				955215BB2D86284E0044B416 /* SCRLCanvasPrototype_Tests */,
 				95EB3BD62D80915800E0F135 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				95EB3BD52D80915800E0F135 /* SCRLCanvasPrototype.app */,
+				955215BA2D86284E0044B416 /* SCRLCanvasPrototype_Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,6 +86,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		955215B92D86284E0044B416 /* SCRLCanvasPrototype_Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 955215C22D86284E0044B416 /* Build configuration list for PBXNativeTarget "SCRLCanvasPrototype_Tests" */;
+			buildPhases = (
+				955215B62D86284E0044B416 /* Sources */,
+				955215B72D86284E0044B416 /* Frameworks */,
+				955215B82D86284E0044B416 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				955215BF2D86284E0044B416 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				955215BB2D86284E0044B416 /* SCRLCanvasPrototype_Tests */,
+			);
+			name = SCRLCanvasPrototype_Tests;
+			packageProductDependencies = (
+			);
+			productName = SCRLCanvasPrototype_Tests;
+			productReference = 955215BA2D86284E0044B416 /* SCRLCanvasPrototype_Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		95EB3BD42D80915800E0F135 /* SCRLCanvasPrototype */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 95EB3BE82D80915900E0F135 /* Build configuration list for PBXNativeTarget "SCRLCanvasPrototype" */;
@@ -93,6 +141,10 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					955215B92D86284E0044B416 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 95EB3BD42D80915800E0F135;
+					};
 					95EB3BD42D80915800E0F135 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -113,11 +165,19 @@
 			projectRoot = "";
 			targets = (
 				95EB3BD42D80915800E0F135 /* SCRLCanvasPrototype */,
+				955215B92D86284E0044B416 /* SCRLCanvasPrototype_Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		955215B82D86284E0044B416 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		95EB3BD32D80915800E0F135 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -128,6 +188,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		955215B62D86284E0044B416 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		95EB3BD12D80915800E0F135 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -137,7 +204,54 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		955215BF2D86284E0044B416 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 95EB3BD42D80915800E0F135 /* SCRLCanvasPrototype */;
+			targetProxy = 955215BE2D86284E0044B416 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		955215C02D86284E0044B416 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5BQNE53G5V;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.SS.SCRLCanvasPrototype-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SCRLCanvasPrototype.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SCRLCanvasPrototype";
+			};
+			name = Debug;
+		};
+		955215C12D86284E0044B416 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5BQNE53G5V;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.SS.SCRLCanvasPrototype-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SCRLCanvasPrototype.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SCRLCanvasPrototype";
+			};
+			name = Release;
+		};
 		95EB3BE92D80915900E0F135 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -318,6 +432,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		955215C22D86284E0044B416 /* Build configuration list for PBXNativeTarget "SCRLCanvasPrototype_Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				955215C02D86284E0044B416 /* Debug */,
+				955215C12D86284E0044B416 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		95EB3BD02D80915800E0F135 /* Build configuration list for PBXProject "SCRLCanvasPrototype" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -139,14 +139,10 @@ class CanvasView: UIView {
             path.addLine(to: CGPoint(x: canvasWidth, y: y))
         }
 
-        DispatchQueue.main.async {
-            self.snapLineLayer.path = path.cgPath
-        }
+        self.snapLineLayer.path = path.cgPath
     }
 
     func hideSnapLines() {
-        DispatchQueue.main.async {
-            self.snapLineLayer.path = nil
-        }
+        self.snapLineLayer.path = nil
     }
 }

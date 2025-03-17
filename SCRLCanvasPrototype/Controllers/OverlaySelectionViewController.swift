@@ -16,7 +16,18 @@ class OverlaySelectionViewController: UIViewController {
     weak var delegate: OverlaySelectionDelegate?
     private var overlays: [OverlayItem] = []
 
-    private let collectionView: UICollectionView = {
+    private let overlayFetcher: OverlayFetcher
+
+    init(overlayFetcher: OverlayFetcher = .shared) {
+        self.overlayFetcher = overlayFetcher
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private(set) var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 10
@@ -67,9 +78,9 @@ class OverlaySelectionViewController: UIViewController {
         dismiss(animated: true)
     }
 
-    private func fetchOverlays() async {
+    func fetchOverlays() async {
         do {
-            overlays = try await OverlayFetcher.shared.fetchOverlays()
+            overlays = try await overlayFetcher.fetchOverlays()
             collectionView.reloadData()
         } catch {
             print("Failed to fetch overlays:", error.localizedDescription)
